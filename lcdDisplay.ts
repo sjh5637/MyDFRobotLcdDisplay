@@ -384,7 +384,7 @@ namespace lcdDisplay {
      * @param color to color ,eg: 0x00FFFF
      */
 
-    //% block="Korean test v0.0.9 at x: %x y: %y color %color"
+    //% block="Korean test v0.0.10 at x: %x y: %y color %color"
     //% x.min=0 x.max=320 x.defl=60
     //% y.min=0 y.max=240 y.defl=120
     //% color.shadow="colorNumberPicker"
@@ -392,7 +392,7 @@ namespace lcdDisplay {
     //% weight=74
     //% group="Basics"
     export function lcdTestKorean(x: number, y: number, color: number) {
-        updateString(255, x, y, "안녕하세요 v0.0.9", FontSize.Large, color);
+        updateString(255, x, y, "안녕하세요 v0.0.10", FontSize.Large, color);
     }
 
 
@@ -1450,7 +1450,7 @@ namespace lcdDisplay {
     }
 
     function stringToUtf8Bytes(str: string): number[] {
-        let buf = Buffer.fromUTF8(str);
+        let buf = control.createBufferFromUTF8(str);
         let bytes: number[] = [];
         for (let i = 0; i < buf.length; i++) {
             bytes.push(buf[i]);
