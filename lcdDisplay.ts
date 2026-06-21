@@ -384,7 +384,7 @@ namespace lcdDisplay {
      * @param color to color ,eg: 0x00FFFF
      */
 
-    //% block="Korean test v0.0.11 at x: %x y: %y color %color"
+    //% block="Korean test v0.0.12 at x: %x y: %y color %color"
     //% x.min=0 x.max=320 x.defl=60
     //% y.min=0 y.max=240 y.defl=120
     //% color.shadow="colorNumberPicker"
@@ -392,10 +392,10 @@ namespace lcdDisplay {
     //% weight=74
     //% group="Basics"
     export function lcdTestKorean(x: number, y: number, color: number) {
-        updateString(255, x, y, "안녕하세요 v0.0.11", FontSize.Large, color);
+        updateString(255, x, y, "안녕하세요 v0.0.12", FontSize.Large, color);
     }
 
-    //% block="Encoding Test v0.0.11 at x: %x y: %y color %color"
+    //% block="Encoding Test v0.0.12 at x: %x y: %y color %color"
     //% x.min=0 x.max=320 x.defl=60
     //% y.min=0 y.max=240 y.defl=120
     //% color.shadow="colorNumberPicker"
@@ -416,6 +416,24 @@ namespace lcdDisplay {
         let len = bytes.length > 242 ? 242 : bytes.length;
         let cmd = creatCommand(CMD_OF_DRAW_TEXT, len + 13);
         cmd = cmd.concat([id, fontSize]).concat(data24Tobyte(color)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
+        writeCommand(cmd, len + 13);
+    }
+
+    //% block="display custom bytes %bytes number %num position x: %x y: %y size %size color %color"
+    //% num.min=1 num.max=255 num.defl=1
+    //% x.min=0 x.max=320 x.defl=120
+    //% y.min=0 y.max=240 y.defl=120
+    //% color.shadow="colorNumberPicker"
+    //% inlineInputMode=inline
+    //% weight=72
+    //% group="Basics"
+    export function lcdDisplayCustomBytes(bytes: number[], num: number, x: number, y: number, size: FontSize, color: number) {
+        let len = bytes.length > 242 ? 242 : bytes.length;
+        let cmd = creatCommand(CMD_OF_DRAW_TEXT, len + 13);
+        cmd = cmd.concat([num, size]).concat(data24Tobyte(color)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
         for (let i = 0; i < len; i++) {
             cmd.push(bytes[i]);
         }
@@ -1477,10 +1495,9 @@ namespace lcdDisplay {
     }
 
     function stringToUtf8Bytes(str: string): number[] {
-        let buf = control.createBufferFromUTF8(str);
         let bytes: number[] = [];
-        for (let i = 0; i < buf.length; i++) {
-            bytes.push(buf[i]);
+        for (let i = 0; i < str.length; i++) {
+            bytes.push(str.charCodeAt(i));
         }
         return bytes;
     }
