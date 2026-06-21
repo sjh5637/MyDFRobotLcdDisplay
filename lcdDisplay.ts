@@ -384,7 +384,7 @@ namespace lcdDisplay {
      * @param color to color ,eg: 0x00FFFF
      */
 
-    //% block="Korean test v0.0.10 at x: %x y: %y color %color"
+    //% block="Korean test v0.0.11 at x: %x y: %y color %color"
     //% x.min=0 x.max=320 x.defl=60
     //% y.min=0 y.max=240 y.defl=120
     //% color.shadow="colorNumberPicker"
@@ -392,7 +392,34 @@ namespace lcdDisplay {
     //% weight=74
     //% group="Basics"
     export function lcdTestKorean(x: number, y: number, color: number) {
-        updateString(255, x, y, "안녕하세요 v0.0.10", FontSize.Large, color);
+        updateString(255, x, y, "안녕하세요 v0.0.11", FontSize.Large, color);
+    }
+
+    //% block="Encoding Test v0.0.11 at x: %x y: %y color %color"
+    //% x.min=0 x.max=320 x.defl=60
+    //% y.min=0 y.max=240 y.defl=120
+    //% color.shadow="colorNumberPicker"
+    //% inlineInputMode=inline
+    //% weight=73
+    //% group="Basics"
+    export function lcdEncodingTest(x: number, y: number, color: number) {
+        // 1. UTF-8 "가" 전송 테스트
+        let utf8Bytes = [0xEA, 0xB0, 0x80];
+        sendCustomBytes(254, x, y, utf8Bytes, FontSize.Large, color);
+
+        // 2. EUC-KR "가" 전송 테스트 (y + 40 위치)
+        let euckrBytes = [0xB0, 0xA1];
+        sendCustomBytes(253, x, y + 40, euckrBytes, FontSize.Large, color);
+    }
+
+    function sendCustomBytes(id: number, x: number, y: number, bytes: number[], fontSize: number, color: number) {
+        let len = bytes.length > 242 ? 242 : bytes.length;
+        let cmd = creatCommand(CMD_OF_DRAW_TEXT, len + 13);
+        cmd = cmd.concat([id, fontSize]).concat(data24Tobyte(color)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
+        writeCommand(cmd, len + 13);
     }
 
 
