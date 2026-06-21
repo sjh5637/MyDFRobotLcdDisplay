@@ -930,26 +930,35 @@ namespace lcdDisplay {
     }
 
     function setBackgroundImg(location: number, str: string) {
-        let len = str.length;
+        let bytes = stringToUtf8Bytes(str);
+        let len = bytes.length;
         let cmd = creatCommand(CMD_SET_BACKGROUND_IMG, len + 5);
         cmd = cmd.concat([location]);
-        str.split("").forEach((value, index) => { cmd.push(value.charCodeAt(0)) });
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
         writeCommand(cmd, len + 5);
     }
 
     function drawString(x: number, y: number, str: string, fontSize: number, color: number) {
-        let len = str.length > 242 ? 242 : str.length;
+        let bytes = stringToUtf8Bytes(str);
+        let len = bytes.length > 242 ? 242 : bytes.length;
         let cmd = creatCommand(CMD_OF_DRAW_TEXT, len + 13);
         cmd = cmd.concat([getID(CMD_OF_DRAW_TEXT), fontSize]).concat(data24Tobyte(color)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
-        str.split("").forEach((value, index) => { cmd.push(value.charCodeAt(0)) });
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
         writeCommand(cmd, len + 13);
     }
 
     function updateString(id: number, x: number, y: number, str: string, fontSize: number, color: number) {
-        let len = str.length > 242 ? 242 : str.length;
+        let bytes = stringToUtf8Bytes(str);
+        let len = bytes.length > 242 ? 242 : bytes.length;
         let cmd = creatCommand(CMD_OF_DRAW_TEXT, len + 13);
         cmd = cmd.concat([id, fontSize]).concat(data24Tobyte(color)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
-        str.split("").forEach((value, index) => { cmd.push(value.charCodeAt(0)) });
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
         writeCommand(cmd, len + 13);
     }
 
@@ -969,10 +978,13 @@ namespace lcdDisplay {
     }
 
     function drawIcon(x: number, y: number, str: string, zoom: number) {
-        let len = str.length;
+        let bytes = stringToUtf8Bytes(str);
+        let len = bytes.length;
         let cmd = creatCommand(CMD_OF_DRAW_ICON_EXTERNAL, len + 11);
         cmd = cmd.concat([getID(CMD_OF_DRAW_ICON_INTERNAL)]).concat(data16Tobyte(zoom)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
-        str.split("").forEach((value, index) => { cmd.push(value.charCodeAt(0)) });
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
         writeCommand(cmd, len + 11);
     }
 
@@ -983,10 +995,13 @@ namespace lcdDisplay {
     }
 
     function updateIcon(id: number, x: number, y: number, str: string, zoom: number) {
-        let len = str.length;
+        let bytes = stringToUtf8Bytes(str);
+        let len = bytes.length;
         let cmd = creatCommand(CMD_OF_DRAW_ICON_EXTERNAL, len + 11);
         cmd = cmd.concat([id]).concat(data16Tobyte(zoom)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
-        str.split("").forEach((value, index) => { cmd.push(value.charCodeAt(0)) });
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
         writeCommand(cmd, len + 11);
     }
 
@@ -998,20 +1013,26 @@ namespace lcdDisplay {
     }
 
     function drawGif(x: number, y: number, str: string, zoom: number): number {
-        let len = str.length;
+        let bytes = stringToUtf8Bytes(str);
+        let len = bytes.length;
         let cmd = creatCommand(CMD_OF_DRAW_GIF_EXTERNAL, len + 11);
         let id = getID(CMD_OF_DRAW_GIF_EXTERNAL);
         cmd = cmd.concat([id]).concat(data16Tobyte(zoom)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
-        str.split("").forEach((value, index) => { cmd.push(value.charCodeAt(0)) });
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
         writeCommand(cmd, len + 11);
         return id;
     }
 
     function updateGif(id: number, x: number, y: number, str: string, zoom: number) {
-        let len = str.length;
+        let bytes = stringToUtf8Bytes(str);
+        let len = bytes.length;
         let cmd = creatCommand(CMD_OF_DRAW_GIF_EXTERNAL, len + 11);
         cmd = cmd.concat([id]).concat(data16Tobyte(zoom)).concat(data16Tobyte(x)).concat(data16Tobyte(y));
-        str.split("").forEach((value, index) => { cmd.push(value.charCodeAt(0)) });
+        for (let i = 0; i < len; i++) {
+            cmd.push(bytes[i]);
+        }
         writeCommand(cmd, len + 11);
     }
 
@@ -1257,19 +1278,26 @@ namespace lcdDisplay {
     }
 
     function setChartAxisTexts(chartId: number, axis: number, text: string[]) {
-        let len = text.length - 1;
-        text.forEach((value, index) => { len = len + value.length });
-        let cmd = creatCommand(CMD_OF_DRAW_LINE_CHART_TEXT, len + 6);
-        cmd = cmd.concat([chartId, axis]);
+        let textBytes: number[][] = [];
+        let totalByteLen = text.length - 1;
         for (let i = 0; i < text.length; i++) {
-            text[i].split("").forEach((value, index) => {
-                cmd.push(value.charCodeAt(0))
-            })
-            if (i != text.length - 1) {
+            let bytes = stringToUtf8Bytes(text[i]);
+            textBytes.push(bytes);
+            totalByteLen += bytes.length;
+        }
+
+        let cmd = creatCommand(CMD_OF_DRAW_LINE_CHART_TEXT, totalByteLen + 6);
+        cmd = cmd.concat([chartId, axis]);
+        for (let i = 0; i < textBytes.length; i++) {
+            let bytes = textBytes[i];
+            for (let j = 0; j < bytes.length; j++) {
+                cmd.push(bytes[j]);
+            }
+            if (i != textBytes.length - 1) {
                 cmd.push(0x0A); // "\n"
             }
         }
-        writeCommand(cmd, len + 6);
+        writeCommand(cmd, totalByteLen + 6);
     }
 
     function updateChartPoint(chartId: number, seriesId: number, pointNum: number, value: number) {
@@ -1401,6 +1429,42 @@ namespace lcdDisplay {
             default:
                 return color;
         }
+    }
+
+    function stringToUtf8Bytes(str: string): number[] {
+        let bytes: number[] = [];
+        for (let i = 0; i < str.length; i++) {
+            let code = str.charCodeAt(i);
+            if (code < 0x80) {
+                bytes.push(code);
+            } else if (code < 0x800) {
+                bytes.push(0xc0 | (code >> 6));
+                bytes.push(0x80 | (code & 0x3f));
+            } else if (code < 0xd800 || code >= 0xe000) {
+                bytes.push(0xe0 | (code >> 12));
+                bytes.push(0x80 | ((code >> 6) & 0x3f));
+                bytes.push(0x80 | (code & 0x3f));
+            } else {
+                // Surrogate pair (4 bytes UTF-8)
+                if (i + 1 < str.length) {
+                    let code2 = str.charCodeAt(i + 1);
+                    if (code2 >= 0xdc00 && code2 <= 0xdfff) {
+                        let utf32 = (((code & 0x3ff) << 10) | (code2 & 0x3ff)) + 0x10000;
+                        bytes.push(0xf0 | (utf32 >> 18));
+                        bytes.push(0x80 | ((utf32 >> 12) & 0x3f));
+                        bytes.push(0x80 | ((utf32 >> 6) & 0x3f));
+                        bytes.push(0x80 | (utf32 & 0x3f));
+                        i++;
+                        continue;
+                    }
+                }
+                // Invalid surrogate or single surrogate
+                bytes.push(0xef);
+                bytes.push(0xbf);
+                bytes.push(0xbd);
+            }
+        }
+        return bytes;
     }
 
     function creatCommand(cmd: number, len: number): number[] {
