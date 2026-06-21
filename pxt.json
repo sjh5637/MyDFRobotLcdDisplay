@@ -10,6 +10,8 @@
         "lcdDisplay.ts",
         "_locales/zh-cn/lcdDisplay-strings.json",
         "_locales/zh-cn/lcdDisplay-jsdoc-strings.json",
+        "_locales/ko/lcdDisplay-strings.json",
+        "_locales/ko/lcdDisplay-jsdoc-strings.json",
         "README.md"
     ],
     "testFiles": [
