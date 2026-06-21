@@ -377,6 +377,24 @@ namespace lcdDisplay {
         updateString(num, x, y, text, size, color);
     }
 
+    /**
+     * Korean text test block - displays "안녕하세요" for testing Hangul support
+     * @param x to x ,eg: 60
+     * @param y to y ,eg: 120
+     * @param color to color ,eg: 0x00FFFF
+     */
+
+    //% block="Korean test at x: %x y: %y color %color"
+    //% x.min=0 x.max=320 x.defl=60
+    //% y.min=0 y.max=240 y.defl=120
+    //% color.shadow="colorNumberPicker"
+    //% inlineInputMode=inline
+    //% weight=74
+    //% group="Basics"
+    export function lcdTestKorean(x: number, y: number, color: number) {
+        updateString(255, x, y, "안녕하세요", FontSize.Large, color);
+    }
+
 
     /**
      * ...
