@@ -1432,37 +1432,10 @@ namespace lcdDisplay {
     }
 
     function stringToUtf8Bytes(str: string): number[] {
+        let buf = Buffer.fromUTF8(str);
         let bytes: number[] = [];
-        for (let i = 0; i < str.length; i++) {
-            let code = str.charCodeAt(i);
-            if (code < 0x80) {
-                bytes.push(code);
-            } else if (code < 0x800) {
-                bytes.push(0xc0 | (code >> 6));
-                bytes.push(0x80 | (code & 0x3f));
-            } else if (code < 0xd800 || code >= 0xe000) {
-                bytes.push(0xe0 | (code >> 12));
-                bytes.push(0x80 | ((code >> 6) & 0x3f));
-                bytes.push(0x80 | (code & 0x3f));
-            } else {
-                // Surrogate pair (4 bytes UTF-8)
-                if (i + 1 < str.length) {
-                    let code2 = str.charCodeAt(i + 1);
-                    if (code2 >= 0xdc00 && code2 <= 0xdfff) {
-                        let utf32 = (((code & 0x3ff) << 10) | (code2 & 0x3ff)) + 0x10000;
-                        bytes.push(0xf0 | (utf32 >> 18));
-                        bytes.push(0x80 | ((utf32 >> 12) & 0x3f));
-                        bytes.push(0x80 | ((utf32 >> 6) & 0x3f));
-                        bytes.push(0x80 | (utf32 & 0x3f));
-                        i++;
-                        continue;
-                    }
-                }
-                // Invalid surrogate or single surrogate
-                bytes.push(0xef);
-                bytes.push(0xbf);
-                bytes.push(0xbd);
-            }
+        for (let i = 0; i < buf.length; i++) {
+            bytes.push(buf[i]);
         }
         return bytes;
     }
